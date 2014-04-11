@@ -137,4 +137,21 @@ class HostedXmlBuilderTest extends \PHPUnit_Framework_TestCase {
         
         $this->assertEquals(1, substr_count($xml, "http://www.cancel.com"));
     }
+
+    public function testXmlWithAndWithoutSubscriptionType() {
+        $order = new CreateOrderBuilder(new SveaConfigurationProvider(SveaConfig::getDefaultConfig()));
+        $payment = new FakeHostedPayment($order);
+        $payment->order = $order;
+
+        $xmlBuilder = new HostedXmlBuilder();
+
+        $requestWithoutSubscriptionType = $payment->calculateRequestValues();
+        $xmlWithoutSubscriptionType = $xmlBuilder->getOrderXML($requestWithoutSubscriptionType, $order);
+
+        $requestWithSubscriptionType = $requestWithoutSubscriptionType + array('subscriptionType' => 'RECURRINGCAPTURE' );
+        $xmlWithSubscriptionType = $xmlBuilder->getOrderXML($requestWithSubscriptionType, $order);
+
+        $this->assertEquals(1, substr_count($xmlWithSubscriptionType, "<subscriptiontype>RECURRINGCAPTURE</subscriptiontype>"));
+        $this->assertEquals(0, substr_count($xmlWithoutSubscriptionType, "<subscriptiontype>"));
+    }
 }

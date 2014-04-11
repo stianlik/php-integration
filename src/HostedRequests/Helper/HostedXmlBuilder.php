@@ -53,6 +53,10 @@ class HostedXmlBuilder {
             $this->XMLWriter->writeElement("paymentmethod", $request['paymentMethod']);
         }
 
+        if (isset($request['subscriptionType'])) {
+            $this->XMLWriter->writeElement("subscriptiontype", $request['subscriptionType']);
+        }
+
         /*
           $this->serializeMap($order->params);
          */

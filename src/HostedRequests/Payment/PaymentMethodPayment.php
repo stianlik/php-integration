@@ -8,6 +8,8 @@ class PaymentMethodPayment extends HostedPayment{
 
     public $paymentMethod;
     public $langCode = "en";
+    public $subscriptionType;
+
     /**
      * @param type $order, $paymentmethod
      */
@@ -102,5 +104,23 @@ class PaymentMethodPayment extends HostedPayment{
         }
 
         return $this;
+    }
+
+    /**
+     * @param string $subscriptionType Constant defined in @see \SubscriptionType
+     * @return PaymentMethodPayment
+     */
+    public function setSubscriptionType($subscriptionType) {
+        $this->subscriptionType = $subscriptionType;
+        return $this;
+    }
+
+    public function calculateRequestValues()
+    {
+        $request = parent::calculateRequestValues();
+        if ($this->subscriptionType !==  null) {
+            $request['subscriptionType'] = $this->subscriptionType;
+        }
+        return $request;
     }
 }

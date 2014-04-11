@@ -38,6 +38,34 @@ class PaymentMethodTest extends \PHPUnit_Framework_TestCase{
         $this->assertEquals(\PaymentMethod::KORTCERT, $xmlMessage->paymentmethod[0]);
     }
 
+    public function testPayPagePaymentWithSetPaymentMethodKortcertAndSubscriptionType()
+    {
+        $config = SveaConfig::getDefaultConfig();
+        $rowFactory = new \TestUtil();
+        $form = \WebPay::createOrder($config)
+            ->addOrderRow(\TestUtil::createOrderRow())
+            ->run($rowFactory->buildShippingFee())
+            ->addDiscount(\WebPayItem::relativeDiscount()
+                ->setDiscountId("1")
+                ->setDiscountPercent(50)
+                ->setUnit("st")
+                ->setName('Relative')
+                ->setDescription("RelativeDiscount")
+            )
+            ->addCustomerDetails(\WebPayItem::individualCustomer()->setNationalIdNumber(194605092222))
+            ->setCountryCode("SE")
+            ->setClientOrderNumber("33")
+            ->setOrderDate("2012-12-12")
+            ->setCurrency("SEK")
+            ->usePaymentMethod(\PaymentMethod::KORTCERT)
+            ->setReturnUrl("http://myurl.se")
+            ->setSubscriptionType(SubscriptionType::RECURRING)
+            ->getPaymentForm();
+
+        $xmlMessage = new \SimpleXMLElement($form->xmlMessage);
+        $this->assertEquals(SubscriptionType::RECURRING, $xmlMessage->subscriptiontype[0]);
+    }
+
     public function testPayPagePaymentWithSetPaymentMethodInvoice() {
         $config = SveaConfig::getDefaultConfig();
         $rowFactory = new \TestUtil();
