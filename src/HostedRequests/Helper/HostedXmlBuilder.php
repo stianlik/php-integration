@@ -223,4 +223,22 @@ class HostedXmlBuilder {
 
         return $this->XMLWriter->flush();
     }
+    
+    /**
+     * @param Recur $recur
+     * @return string
+     */
+    public function getRecurXML($recur) {
+        $this->setBaseXML();
+        $this->XMLWriter->startElement("recur");
+        $this->XMLWriter->writeElement("customerrefno", $recur->clientOrderNumber);
+        $this->XMLWriter->writeElement("subscriptionid", $recur->subscriptionId);
+        if ($recur->currency) {
+            $this->XMLWriter->writeElement("currency", $recur->currency);
+        }
+        $this->XMLWriter->writeElement("amount", $recur->amount);
+        $this->XMLWriter->endElement();
+        $this->XMLWriter->endDocument();
+        return $this->XMLWriter->flush();
+    }
 }

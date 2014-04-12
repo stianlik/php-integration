@@ -139,7 +139,7 @@ class HostedXmlBuilderTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testXmlWithAndWithoutSubscriptionType() {
-        $order = new CreateOrderBuilder(new SveaConfigurationProvider(SveaConfig::getDefaultConfig()));
+        $order = new CreateOrderBuilder($this->getConfigurationProvider());
         $payment = new FakeHostedPayment($order);
         $payment->order = $order;
 
@@ -153,5 +153,54 @@ class HostedXmlBuilderTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertEquals(1, substr_count($xmlWithSubscriptionType, "<subscriptiontype>RECURRINGCAPTURE</subscriptiontype>"));
         $this->assertEquals(0, substr_count($xmlWithoutSubscriptionType, "<subscriptiontype>"));
+    }
+    
+    public function testXmlRecurWithoutCurrency() {
+        $xmlBuilder = new HostedXmlBuilder();
+        $xml = $xmlBuilder->getRecurXML($this->getRecur());
+        $this->assertNotTag(array('tag' => 'currency'), $xml, 'did not expect currency tag');
+        $this->assertRequiredRecurFields($xml);
+    }
+    
+    public function testXmlRecurWithCurrency() {
+        $xmlBuilder = new HostedXmlBuilder();
+        $xml = $xmlBuilder->getRecurXML($this->getRecur()->setCurrency('NOK'));
+        $this->assertTag(array(
+            'tag' => 'currency',
+            'parent' => array('tag' => 'recur'),
+            'content' => 'NOK'
+        ), $xml, 'expect currency tag');
+        $this->assertRequiredRecurFields($xml);
+    }
+    
+    private function assertRequiredRecurFields($xml) {
+        $this->assertTag(array(
+            'tag' => 'customerrefno',
+            'parent' => array('tag' => 'recur'),
+            'content' => 'cid'
+        ), $xml, 'customerrefno is required');
+        $this->assertTag(array(
+            'tag' => 'subscriptionid',
+            'parent' => array('tag' => 'recur'),
+            'content' => 'sid'
+        ), $xml, 'subscriptionid is required');
+        $this->assertTag(array(
+            'tag' => 'amount',
+            'parent' => array('tag' => 'recur'),
+            'content' => '10000'
+        ), $xml, 'amount is required');
+    }
+    
+    private function getRecur() {
+        $recur = new Recur($this->getConfigurationProvider());
+        $recur->setAmount(100.00)
+            ->setClientOrderNumber("cid")
+            ->setCountryCode("NO")
+            ->setSubscriptionId("sid");
+        return $recur;
+    }
+    
+    private function getConfigurationProvider() {
+        return new SveaConfigurationProvider(SveaConfig::getDefaultConfig());
     }
 }

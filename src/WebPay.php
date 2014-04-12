@@ -48,6 +48,20 @@ class WebPay {
        }
         return new Svea\GetPaymentPlanParams($config);
     }
+    
+    /**
+     * The recur request can be used to perform recur operations on your card (KORTCERT) subscriptions.
+     * @return \Svea\Recur object
+     * @param instance of implementation class of ConfigurationProvider Interface
+     */
+    public static function recur($config) {
+       if ($config == NULL) {
+           throw new Exception('-missing parameter:
+                                This method requires an ConfigurationProvider object as parameter. Create a class that implements class ConfigurationProvider. Set returnvalues to configuration values. Create an object from that class. Alternative use static function from class SveaConfig e.g. SveaConfig::getDefaultConfig(). You can replace the default config values to return your own config values in the method.'
+                                );
+       }
+        return new Svea\Recur($config);
+    }
 
     /**
      * Calculates price per month for all available campaigns.
