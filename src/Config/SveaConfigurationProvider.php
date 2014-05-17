@@ -121,7 +121,7 @@ class SveaConfigurationProvider implements \ConfigurationProvider {
      */
     private function throwInvalidTypeException() {
         throw new InvalidTypeException(sprintf(
-            'Invalid type. Accepted values: %s, %s or %s',
+            'Invalid type. Accepted values: %s, %s, %s, or %s',
             \ConfigurationProvider::INVOICE_TYPE,
             \ConfigurationProvider::PAYMENTPLAN_TYPE,
             \ConfigurationProvider::HOSTED_TYPE,
